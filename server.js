@@ -3,42 +3,37 @@
 // start the server with "node server.js" or "nodemon server.js"
 
 // Dependencies
-var express = require('express');
-var mongoose = require('mongoose')
-var bodyParser = require('body-parser');
+const express = require('express');
+const path = require('path');
+const mongoose = require('mongoose')
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 
 // MongoDB
 mongoose.connect('mongodb://localhost/rest_test');
 
 // Express
-var app = express();
+const app = express();
 
-// Add headers (from https://stackoverflow.com/a/18311469/2913371)
-app.use(function (req, res, next) {
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 
-  // Website you wish to allow to connect
-  res.setHeader('Access-Control-Allow-Origin', 'http://myjs');
-
-  // Request methods you wish to allow
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-
-  // Request headers you wish to allow
-  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-
-  // Set to true if you need the website to include cookies in the requests sent
-  // to the API (e.g. in case you use sessions)
-  res.setHeader('Access-Control-Allow-Credentials', true);
-
-  // Pass to next layer of middleware
-  next();
-});
-
-app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
+
+console.log(__dirname);
 
 // Routes
 app.use('/api', require('./routes/api'));
-app.get('/', function (req, res) { res.send('working'); });
+
+app.get('/', function (req, res) {
+  res.render('default', {
+    dummy: 'dummy'
+  });
+});
 
 // Start Server
 app.listen(3000);
