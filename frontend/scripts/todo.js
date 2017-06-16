@@ -28,8 +28,9 @@ let todo = (function() {
       let action = event.target.getAttribute('data-todo');
       if (action === 'add-item') addTodo();
       else {
-        let index = [...todoList.children].indexOf(event.target.closest('[data-todo="item"]') || event.target.closest('[data-todo="item-edit"]'));
-        if (action === 'edit-item') updateTodo(index);
+        let index = [...todoList.children].indexOf(event.target.closest('[data-todo^="item"]'));
+        let id = index >= 0 ? todos[index]._id : null;
+        if (action === 'edit-item') updateTodo(index,id);
       }
     }
   });
@@ -37,7 +38,7 @@ let todo = (function() {
   container.addEventListener('keyup', (event) => {
     if (event.keyCode === 27) {
       let action = event.target.getAttribute('data-todo');
-      let index = [...todoList.children].indexOf(event.target.closest('[data-todo="item"]') || event.target.closest('[data-todo="item-edit"]'));
+      let index = [...todoList.children].indexOf(event.target.closest('[data-todo^="item"]'));
       if (action === 'edit-item') cancelTodo(index);
     }
   });
