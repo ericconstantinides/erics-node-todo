@@ -11,10 +11,9 @@ let todo = (function() {
   // Bind Event(s) (really it's just one event delegation)
   container.addEventListener('click', (event) => {
     // get the index using ES6 destructuring, then back to an array, then indexOf
-    let index = [...todoList.children].indexOf(event.target.closest('[data-todo="item"]')
-      || event.target.closest('[data-todo="item-edit"]'));
+    let index = [...todoList.children].indexOf(event.target.closest('[data-todo^="item"]'));
     // get the database ID:
-    let id = index > 0 ? todos[index]._id : null;
+    let id = index >= 0 ? todos[index]._id : null;
     let action = event.target.getAttribute('data-todo');
     if (action === 'edit') editTodo(index);
     else if (action === 'delete') deleteTodo(index,id);
