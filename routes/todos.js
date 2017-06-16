@@ -7,7 +7,6 @@ var Todo = require('../models/Todo.js');
 router.get('/', function(req, res, next) {
   Todo.find(function (err, todos) {
     if (err) return next(err);
-    console.log(todos);
     res.json(todos);
   });
 });

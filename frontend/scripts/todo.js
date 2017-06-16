@@ -47,7 +47,6 @@ let todo = (function() {
 
   // _render is the only place we repaint:
   function _render(selectedIndex) {
-    console.log(todos);
     todoList.innerHTML = '';
     todos.forEach(item => {
       if (item.status !== 'edit') {
@@ -134,7 +133,6 @@ let todo = (function() {
     request.onload = function() {
       if (this.status >= 200 && this.status < 400) {
         // add the id to the last one:
-        console.log('success');
       }
     };
     request.setRequestHeader('Content-Type', 'application/json');
@@ -165,7 +163,6 @@ let todo = (function() {
     request.onload = function() {
       if (this.status >= 200 && this.status < 400) {
         // add the id to the last one:
-        console.log('success');
       }
     };
     request.setRequestHeader('Content-Type', 'application/json');
