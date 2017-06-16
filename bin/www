@@ -5,7 +5,7 @@
  */
 
 var app = require('../app');
-var debug = require('debug')('todo-api:server');
+var debug = require('debug')('erics-node-todo:server');
 var http = require('http');
 
 /**

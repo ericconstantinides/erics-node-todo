@@ -16,8 +16,8 @@ const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 
 // connect to MongoDB
-mongoose.connect('mongodb://localhost/node-todo')
-  .then(() =>  console.log('connection to node-todo db succesful'))
+mongoose.connect('mongodb://localhost/erics-node-todo')
+  .then(() =>  console.log('connection to rest-test db succesful'))
   .catch((err) => console.error(err));
 
 const app = express();

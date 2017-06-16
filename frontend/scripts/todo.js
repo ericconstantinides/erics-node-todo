@@ -20,8 +20,8 @@ let todo = (function() {
     else if (action === 'delete') deleteTodo(index,id);
     else if (action === 'add') addTodo();
     else if (action === 'cancel') cancelTodo(index);
-    else if (action === 'update') updateTodo(index);
-    else if (action === 'checkmark') completeTodo(index);
+    else if (action === 'update') updateTodo(index,id);
+    else if (action === 'checkmark') completeTodo(index,id);
   });
 
   container.addEventListener('keydown', (event) => {
@@ -47,6 +47,7 @@ let todo = (function() {
 
   // _render is the only place we repaint:
   function _render(selectedIndex) {
+    console.log(todos);
     todoList.innerHTML = '';
     todos.forEach(item => {
       if (item.status !== 'edit') {
@@ -75,11 +76,9 @@ let todo = (function() {
   // RESTful events
   function getTodos(callback) {
     let request = new XMLHttpRequest();
-    request.open('GET', '/', true);
+    request.open('GET', '/todos', true);
     request.onload = function() {
       if (this.status >= 200 && this.status < 400) {
-        // Success!
-        // todos = Object.keys(data).map((k) => data[k])
         todos = JSON.parse(this.response);
         callback()
       }
@@ -94,20 +93,27 @@ let todo = (function() {
     input = input || addTodoInput.value;
     // if either one is an input:
     if(input) {
-      let request = new XMLHttpRequest();
-      request.open('POST', `/TEMP?title=${input}&status=open`, true);
-      request.onload = function() {
-        if (this.status >= 200 && this.status < 400) {
-          // we should really get the id here:
-          console.log(JSON.parse(this.response));
-        }
-      };
-      request.send();
-      // add it to the top:
-      todos.unshift({
+      // add it to the list:
+      let newPosition = todos.length;
+      todos.push({
         title: input,
         status: 'open'
       });
+      // add it to the api
+      let request = new XMLHttpRequest();
+      let newTodo = {
+        title: input,
+        status: "open"
+      };
+      request.open('POST', '/todos', true);
+      request.onload = function() {
+        if (this.status >= 200 && this.status < 400) {
+          // add the id to the last one:
+          todos[newPosition]._id = JSON.parse(this.response)._id;
+        }
+      };
+      request.setRequestHeader('Content-Type', 'application/json');
+      request.send(JSON.stringify(newTodo));
       // clear out the input
       addTodoInput.value = '';
       _render();
@@ -116,8 +122,23 @@ let todo = (function() {
     }
   }
 
-  function completeTodo(index) {
+  function completeTodo(index,dbId) {
     todos[index].status = todos[index].status === 'open' ? 'complete' : 'open';
+    // update the api
+    let updatedTodo = {
+      title: todos[index].title,
+      status: todos[index].status
+    };
+    let request = new XMLHttpRequest();
+    request.open('PUT', `/todos/${dbId}`, true);
+    request.onload = function() {
+      if (this.status >= 200 && this.status < 400) {
+        // add the id to the last one:
+        console.log('success');
+      }
+    };
+    request.setRequestHeader('Content-Type', 'application/json');
+    request.send(JSON.stringify(updatedTodo));
     _render();
   }
 
@@ -131,15 +152,30 @@ let todo = (function() {
     _render();
   }
 
-  function updateTodo(index) {
+  function updateTodo(index,dbId) {
     todos[index].title = todoList.children[index].querySelector('[data-todo="edit-item"]').value;
     todos[index].status = 'open';
+    // update the api
+    let updatedTodo = {
+      title: todos[index].title,
+      status: todos[index].status
+    };
+    let request = new XMLHttpRequest();
+    request.open('PUT', `/todos/${dbId}`, true);
+    request.onload = function() {
+      if (this.status >= 200 && this.status < 400) {
+        // add the id to the last one:
+        console.log('success');
+      }
+    };
+    request.setRequestHeader('Content-Type', 'application/json');
+    request.send(JSON.stringify(updatedTodo));
     _render();
   }
 
   function deleteTodo(index,dbId) {
     let request = new XMLHttpRequest();
-    request.open('DELETE', `/api/todos/${dbId}`, true);
+    request.open('DELETE', `/todos/${dbId}`, true);
     request.onload = function() {
       if (this.status >= 200 && this.status < 400) {
         // Success!
