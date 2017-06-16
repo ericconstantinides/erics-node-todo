@@ -32,17 +32,17 @@ const cached           = require('gulp-cached');
 //                 ├─css
 //                 └─js
 const themes = [
-  'public',
+  './',
 ];
 // };
 
-const srcDir           = 'src';
+const srcDir           = 'frontend';
 
 const jsSource         = 'scripts';
-const jsDestination    = 'js';
+const jsDestination    = 'public/js';
 
 const cssSource        = 'styles';
-const cssDestination   = 'css';
+const cssDestination   = 'public/css';
 
 const parseError = function() {
   if (this.plugin === 'gulp-sass') {
@@ -100,7 +100,7 @@ gulp.task('scripts', function() {
         // plugins: ['transform-react-jsx']
       }))
       // .pipe(concat(folder + '.js'))
-      // .pipe(uglify())
+      .pipe(uglify())
       .pipe(sourcemaps.write('./', {
         sourceRoot: theme + '/' + srcDir + '/' + jsSource,  //
         includeContent: true     // default is true, which includes the entire css in the sourcemap
