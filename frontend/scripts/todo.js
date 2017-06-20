@@ -83,7 +83,7 @@ let todo = (function() {
 
   // RESTful events
   function getTodos(callback) {
-    fetch('todos')
+    fetch('/todos')
       .then(status)
       .then(json)
       .then(data => {
@@ -100,17 +100,18 @@ let todo = (function() {
     if (input) {
       // add it to the list:
       let newTodo = { title: input, status: 'open' };
-      todos.push(newTodo);
+      let newPosition = todos.push(newTodo) - 1;
 
       // add it to the api
-      fetch('todos', {
+      fetch('/todos', {
           method: 'POST',
           headers: {'Content-type': 'application/json'},
           body: JSON.stringify(newTodo)
         })
+        .then(status)
         .then(json)
         // Success, add the id to the last one:
-        .then(data => todos[todos.length]._id = JSON.parse(this.response)._id)
+        .then(data => todos[newPosition]._id = data._id)
         .catch(error => console.log('Request failed', error));
 
       // clear out the input
@@ -129,8 +130,7 @@ let todo = (function() {
         headers: {'Content-type': 'application/json'},
         body: JSON.stringify({title: todos[index].title,status: todos[index].status})
       })
-      .then(json)
-      .then() // success
+      .then(status)
       .catch(error => console.log('Request failed', error));
     _render();
   }
@@ -154,8 +154,7 @@ let todo = (function() {
         headers: {'Content-type': 'application/json'},
         body: JSON.stringify({title: todos[index].title, status: todos[index].status})
       })
-      .then(json)
-      .then() // success
+      .then(status)
       .catch(error => console.log('Request failed', error));
     _render();
   }
@@ -165,11 +164,12 @@ let todo = (function() {
     todos.splice(index, 1);
     // update the API
     fetch(`/todos/${dbId}`, { method: 'DELETE' })
-      .then(json)
-      .then() // success
+      .then(status)
       .catch(error => console.log('Request failed', error));
     _render();
   }
+
+  function todoApi(method, parameters) {}
 
   // return the public methods
   return {
