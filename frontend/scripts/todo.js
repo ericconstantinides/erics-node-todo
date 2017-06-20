@@ -72,47 +72,47 @@ let todo = (function() {
     }
   }
 
+  function status(response) {
+    if (response.status >= 200 && response.status < 300) return Promise.resolve(response)
+    else return Promise.reject(new Error(response.statusText))
+  }
+
+  function json(response) {
+    return response.json()
+  }
+
   // RESTful events
   function getTodos(callback) {
-    let request = new XMLHttpRequest();
-    request.open('GET', '/todos', true);
-    request.onload = function() {
-      if (this.status >= 200 && this.status < 400) {
-        todos = JSON.parse(this.response);
-        callback()
-      }
-    };
-    request.send();
+    fetch('todos')
+      .then(status)
+      .then(json)
+      .then(data => {
+        todos = data;
+        callback();
+      })
+      .catch(error => console.log('Request failed', error));
   }
-  function postTodos(){}
-  function putTodos(){}
 
   function addTodo(input) {
     // check if there's an input:
     input = input || addTodoInput.value;
     // if either one is an input:
-    if(input) {
+    if (input) {
       // add it to the list:
-      let newPosition = todos.length;
-      todos.push({
-        title: input,
-        status: 'open'
-      });
+      let newTodo = { title: input, status: 'open' };
+      todos.push(newTodo);
+
       // add it to the api
-      let request = new XMLHttpRequest();
-      let newTodo = {
-        title: input,
-        status: "open"
-      };
-      request.open('POST', '/todos', true);
-      request.onload = function() {
-        if (this.status >= 200 && this.status < 400) {
-          // add the id to the last one:
-          todos[newPosition]._id = JSON.parse(this.response)._id;
-        }
-      };
-      request.setRequestHeader('Content-Type', 'application/json');
-      request.send(JSON.stringify(newTodo));
+      fetch('todos', {
+          method: 'POST',
+          headers: {'Content-type': 'application/json'},
+          body: JSON.stringify(newTodo)
+        })
+        .then(json)
+        // Success, add the id to the last one:
+        .then(data => todos[todos.length]._id = JSON.parse(this.response)._id)
+        .catch(error => console.log('Request failed', error));
+
       // clear out the input
       addTodoInput.value = '';
       _render();
@@ -123,20 +123,15 @@ let todo = (function() {
 
   function completeTodo(index,dbId) {
     todos[index].status = todos[index].status === 'open' ? 'complete' : 'open';
-    // update the api
-    let updatedTodo = {
-      title: todos[index].title,
-      status: todos[index].status
-    };
-    let request = new XMLHttpRequest();
-    request.open('PUT', `/todos/${dbId}`, true);
-    request.onload = function() {
-      if (this.status >= 200 && this.status < 400) {
-        // add the id to the last one:
-      }
-    };
-    request.setRequestHeader('Content-Type', 'application/json');
-    request.send(JSON.stringify(updatedTodo));
+    // add it to the api
+    fetch(`/todos/${dbId}`, {
+        method: 'PUT',
+        headers: {'Content-type': 'application/json'},
+        body: JSON.stringify({title: todos[index].title,status: todos[index].status})
+      })
+      .then(json)
+      .then() // success
+      .catch(error => console.log('Request failed', error));
     _render();
   }
 
@@ -154,33 +149,25 @@ let todo = (function() {
     todos[index].title = todoList.children[index].querySelector('[data-todo="edit-item"]').value;
     todos[index].status = 'open';
     // update the api
-    let updatedTodo = {
-      title: todos[index].title,
-      status: todos[index].status
-    };
-    let request = new XMLHttpRequest();
-    request.open('PUT', `/todos/${dbId}`, true);
-    request.onload = function() {
-      if (this.status >= 200 && this.status < 400) {
-        // add the id to the last one:
-      }
-    };
-    request.setRequestHeader('Content-Type', 'application/json');
-    request.send(JSON.stringify(updatedTodo));
+    fetch(`/todos/${dbId}`, {
+        method: 'PUT',
+        headers: {'Content-type': 'application/json'},
+        body: JSON.stringify({title: todos[index].title, status: todos[index].status})
+      })
+      .then(json)
+      .then() // success
+      .catch(error => console.log('Request failed', error));
     _render();
   }
 
   function deleteTodo(index,dbId) {
-    let request = new XMLHttpRequest();
-    request.open('DELETE', `/todos/${dbId}`, true);
-    request.onload = function() {
-      if (this.status >= 200 && this.status < 400) {
-        // Success!
-      }
-    };
-    request.send();
     // take 1 object out of the array at the index:
     todos.splice(index, 1);
+    // update the API
+    fetch(`/todos/${dbId}`, { method: 'DELETE' })
+      .then(json)
+      .then() // success
+      .catch(error => console.log('Request failed', error));
     _render();
   }
 
