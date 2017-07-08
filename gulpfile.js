@@ -36,12 +36,12 @@ const themes = [
 ];
 // };
 
-const srcDir           = 'frontend';
+const srcDir           = 'src';
 
-const jsSource         = 'scripts';
+const jsSource         = 'js';
 const jsDestination    = 'public/js';
 
-const cssSource        = 'styles';
+const cssSource        = 'sass';
 const cssDestination   = 'public/css';
 
 const parseError = function() {
